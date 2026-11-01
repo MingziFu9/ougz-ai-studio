@@ -1,0 +1,10 @@
+---
+import Base from '../layouts/Base.astro';
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+---
+<Base title="页面不存在">
+  <section class="hero page-hero" slot="hero"><div class="wrap" style="display:block">
+    <h1>页面不存在</h1>
+    <p class="lede">这个地址没有对应的页面。<a href={base} style="color:var(--hero-ink)">回到全部系统 →</a></p>
+  </div></section>
+</Base>

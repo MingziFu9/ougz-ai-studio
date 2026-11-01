@@ -1,0 +1,181 @@
+# 系统清单：网站上的所有系统信息都来自这里。新增系统就复制一段改字段。
+#   id        网址里用的英文标识，例如 ppt -> /systems/ppt/
+#   short     地图和图标上显示的简称（最多 5 个字）
+#   category  对应 categories.yaml 里的 id
+#   status    online = 已上线（默认）；building = 建设中（不显示「立即使用」，url 可不填）
+#   network   intranet = 只能内网访问；public = 公网可访问
+#   art       封面插画：ppt avatar anim nano qbank parse graph python thesis arxiv course；不填则用通用插画
+#   description  卡片上的一句话简介
+#   intro     详情页的完整介绍
+#   audience  适合谁用
+#   features  功能亮点；steps 快速上手步骤
+# 介绍文字根据系统名称和用途整理，负责人、联系方式、更新时间待补充，请各系统负责人核对。
+
+- id: ppt
+  name: PPT 讲稿 AI 生成系统
+  short: 讲稿
+  category: gen
+  url: http://10.255.1.103:6001/
+  network: intranet
+  description: 上传 PPT，生成一份每页备注里都写好讲稿的 PPT。
+  intro: 做好课件之后，为每一页写讲解词往往很花时间。老师上传 PPT，系统逐页理解内容，为每一页生成对应的讲稿并写入该页备注，老师检查修改后即可用于上课，也可以交给数字人系统生成讲解视频。
+  audience: 已有 PPT 课件、需要为每页准备讲稿的任课教师
+  scene: 给已有的 PPT 课件快速配上逐页讲稿。
+  features: [上传 PPT 文件即可使用, 逐页生成讲稿，写入 PPT 每页备注, 生成的带讲稿 PPT 可直接用于数字人视频生成]
+  steps: [打开系统，上传 PPT 文件, 等待系统逐页生成讲稿, 检查并修改讲稿, 下载讲稿已写入备注的 PPT]
+  art: ppt
+  order: 1
+
+- id: avatar
+  name: 自助式数字人教学视频生成系统
+  short: 视频
+  category: gen
+  url: http://10.255.1.115:5001/login
+  network: intranet
+  login: true
+  description: 上传带讲稿的 PPT，自助生成数字人讲解的教学视频。
+  intro: 录制教学视频通常需要场地、设备和反复重录。老师只需上传带讲稿的 PPT，选择数字人形象和声音，系统就会按每页备注里的讲稿生成由数字人出镜讲解的教学视频，适合批量制作微课和课程导学视频。
+  audience: 需要制作微课、导学视频、课程宣传视频的教师和课程团队
+  scene: 录制微课、课程导学视频，不用真人出镜。
+  features: [上传带讲稿的 PPT 即可生成（讲稿写在每页备注里）, 可自选数字人形象，也可使用公版形象，并选择声音, 数字人按讲稿讲解、口型同步, 可直接使用「PPT 讲稿 AI 生成系统」生成的 PPT]
+  steps: [登录系统, 上传带讲稿的 PPT, 选择数字人形象和声音, 提交生成，完成后预览并下载视频]
+  art: avatar
+  order: 2
+
+- id: anim
+  name: 知识点动画
+  short: 动画
+  category: gen
+  url: http://10.255.1.103:7001/
+  network: intranet
+  description: 把一个知识点生成讲解动画，用于课堂演示。
+  intro: 有些知识点靠文字和静态图片很难讲清楚，比如过程、变化和原理。这个系统根据对知识点的描述生成讲解动画，把抽象内容变成直观的演示，可以直接在课堂上播放，也可以插入 PPT 或教学视频。
+  audience: 讲授抽象概念、过程类知识点的教师
+  scene: 抽象概念、过程类知识点的课堂演示。
+  features: [用文字描述知识点即可生成动画, 适合演示过程、变化和原理, 可插入 PPT 或教学视频]
+  steps: [打开系统，输入知识点名称和讲解要点, 生成动画并预览, 不满意时调整描述重新生成, 下载动画用于课堂或视频]
+  art: anim
+  order: 3
+
+- id: nano
+  name: nano banana
+  short: 图像
+  category: gen
+  url: http://10.255.1.103:5174/
+  network: intranet
+  description: 基于 nano banana 图像模型的图片生成与编辑，用于课件配图。
+  intro: 课件、海报和教学材料经常缺少合适的配图。这个工具基于 nano banana 图像模型，可以用文字描述生成图片，也可以上传已有图片，按描述修改局部或调整风格，快速得到可用的教学配图。
+  audience: 需要课件配图、宣传海报的教师和课程团队
+  scene: 为课件、海报快速生成或修改配图。
+  features: [用文字描述生成图片, 上传图片后按描述修改, 适合课件配图和宣传海报]
+  steps: [打开系统, 输入画面描述，或上传要修改的图片, 生成后挑选满意的结果, 下载图片插入课件]
+  art: nano
+  order: 4
+
+- id: course
+  name: 国开学习网课程包生成系统
+  short: 课程包
+  slogan: 课程学习网站一天建成！
+  category: gen
+  status: building
+  network: public
+  description: 把课程资料整理成符合国开学习网要求的课程包，正在建设中。
+  intro: 在国开学习网上建课，需要把课程资料按平台要求整理成章节、资源和测验。这个系统正在建设中，目标是把教材、课件、视频和题目自动组织成可以导入国开学习网的课程包，减少手工搬运和排版。上线后会在这里提供入口。
+  audience: 在国开学习网上建设和维护课程的教师与课程团队
+  scene: 新建或改版国开学习网课程时，快速生成课程包。
+  features: [按章节组织课程结构, 汇总课件、视频、题库等资源, 生成符合国开学习网要求的课程包]
+  steps: [系统建设中，上线后会在此更新使用步骤]
+  art: course
+  order: 5
+
+- id: qbank
+  name: 教材题库生成 · 核心板
+  short: 题库
+  category: book
+  url: http://10.255.1.108/workflow/A60gsD3Mx9ovv25O
+  network: intranet
+  description: 根据教材内容生成配套练习题，沉淀为课程题库。
+  intro: 为每章编写习题和测验很耗时。这个系统读取教材内容，按章节生成多种题型的练习题，并附上答案和解析，帮助老师快速搭建课程题库。教材如果是扫描版，可以先用「教材解析 · 文字版 PDF」转换成文字版再使用。
+  audience: 需要编写课后习题、单元测验、期末题库的教师
+  scene: 编写课后习题、单元测验和期末题库。
+  features: [按章节从教材生成练习题, 支持多种题型, 同时生成答案与解析, 结果可整理为课程题库]
+  steps: [打开系统，上传教材或章节内容, 选择章节和题型, 生成题目并逐题检查修改, 导出题目用于练习或测验]
+  art: qbank
+  order: 6
+
+- id: parse
+  name: 教材解析 · 文字版 PDF
+  short: 解析
+  category: book
+  url: http://10.255.1.108/workflow/SCaDosQYb0bygnKP
+  network: intranet
+  description: 把扫描版 PDF 识别转换成文字版 PDF，文字可复制、可检索。
+  intro: 很多教材和资料只有扫描版 PDF，内容是图片，无法复制、搜索，也不能直接交给其他 AI 工具处理。这个系统对扫描版 PDF 做文字识别，转换成文字版 PDF，转换后可以复制文字、全文检索，也能继续用于题库生成等工作。
+  audience: 手上只有扫描版教材或资料、需要提取文字的教师
+  scene: 扫描版教材转文字版，供复制引用、检索和后续出题使用。
+  features: [识别扫描版 PDF 中的文字, 输出文字版 PDF, 转换后可复制、可检索, 可作为题库生成等系统的输入]
+  steps: [打开系统，上传扫描版 PDF, 等待识别转换完成, 下载文字版 PDF 并抽查识别效果]
+  art: parse
+  order: 7
+
+- id: graph
+  name: 认知图谱学习平台
+  short: 图谱
+  category: learn
+  url: https://8.163.117.26:15500/
+  network: public
+  login: true
+  description: 用知识图谱组织课程知识点，学生按图谱路径学习。
+  intro: 课程知识点之间有先后和关联，按章节线性学习时容易看不清全貌。这个平台把课程知识点组织成知识图谱，学生可以直观看到知识之间的联系，按推荐的路径学习，并针对薄弱的知识点查漏补缺。
+  audience: 学生；需要梳理课程知识体系的教师
+  scene: 课程知识体系梳理，学生自主学习与查漏补缺。
+  features: [可视化展示课程知识图谱, 显示知识点之间的前后依赖, 推荐学习路径, 针对薄弱知识点查漏补缺]
+  steps: [登录平台, 选择课程，查看知识图谱, 按推荐路径学习知识点, 根据掌握情况复习薄弱环节]
+  art: graph
+  order: 8
+
+- id: python
+  name: 在线 Python 实训平台
+  short: Py
+  category: learn
+  url: https://8.163.117.26:8080/
+  network: public
+  login: true
+  description: 在浏览器里写代码、跑代码，配套实训任务。
+  intro: 学生上机实训经常卡在装环境上。这个平台在浏览器里直接提供 Python 编程环境，不用安装任何软件；配套实训任务，提交后自动判题，老师可以把精力放在讲解和答疑上。
+  audience: 学习 Python 的学生；Python 课程的任课教师
+  scene: Python 课程上机实训和课后练习。
+  features: [浏览器内在线编写、运行代码, 无需安装开发环境, 配套实训任务, 提交后自动判题]
+  steps: [登录平台, 选择实训任务并阅读要求, 在线编写并运行代码, 提交代码查看判题结果]
+  art: python
+  order: 9
+
+- id: thesis
+  name: 论文审核系统
+  short: 审稿
+  category: research
+  url: http://10.255.1.103:8000/
+  network: intranet
+  description: 上传论文，自动检查格式与写作规范并给出修改建议。
+  intro: 论文格式和写作规范问题多而琐碎，人工逐条检查费时费力。这个系统对上传的论文做自动审核，指出格式、引用和表述上的问题，并逐条给出修改建议，适合学生提交前自查，也能帮老师在批阅前做初筛。
+  audience: 撰写毕业论文、课程论文的学生；指导和批阅论文的教师
+  scene: 学生论文提交前自查，教师批阅前初筛。
+  features: [检查格式与写作规范, 标出问题位置, 逐条给出修改建议]
+  steps: [打开系统，上传论文文件, 等待审核完成, 按问题清单逐条修改, 修改后可再次上传复查]
+  art: thesis
+  order: 10
+
+- id: arxiv
+  name: Daily arXiv AI Enhanced
+  short: arXiv
+  category: research
+  url: http://10.255.1.102/index.html
+  network: intranet
+  description: 每日抓取 arXiv 新论文，用 AI 生成中文摘要并分类。
+  intro: arXiv 每天都有大量 AI 方向的新论文，逐篇阅读英文摘要很难跟上。这个系统每天自动抓取新论文，用 AI 生成中文摘要并按研究方向分类，打开网页就能快速浏览当天的新进展，找到值得细读的论文。
+  audience: 关注 AI 前沿进展的教师和研究人员
+  scene: 每天快速浏览 AI 方向的新论文。
+  features: [每天自动更新, AI 生成中文摘要, 按研究方向分类, 链接到论文原文]
+  steps: [打开网页, 按方向浏览当天的新论文, 读中文摘要筛选感兴趣的论文, 点击链接阅读原文]
+  art: arxiv
+  order: 11

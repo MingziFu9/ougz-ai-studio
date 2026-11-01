@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { SITE } from '../data/site';
+const team = (await getCollection('team')).sort((a, b) => a.data.order - b.data.order);
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+---
+<Base title="关于团队" active="about">
+  <section class="hero page-hero about-hero" slot="hero"><div class="wrap">
+    <div>
+      <p class="eyebrow"><i></i>OUGZ AI STUDIO · TEAM</p>
+      <h1>拥抱 <em>AI</em></h1>
+      <p class="lede">ougz 人工智能工作室负责各自研 AI 系统的研发与运维，用 AI 让教学更高效，让创新看得见。团队也是广州开放大学人工智能技术应用专业的核心教学团队，正在建设专业课程的<a href={`${base}courses/`} style="color:#8fd3f4">开源课程</a>。</p>
+    </div>
+    <figure class="group"><img src={`${base}team/group.jpg`} alt="ougz 人工智能工作室团队合影（卡通形象）" width="876" height="834" /></figure>
+  </div></section>
+  <div class="wrap" style="padding-block:56px 64px">
+    <h2 class="sec">团队成员</h2>
+    <div class="members">
+      {team.map((m, i) => (
+        <article class="member" style={`--i:${i}`}>
+          <div class="ph">{m.data.photo && <img src={`${base}team/${m.data.photo}`} alt={m.data.name} loading="lazy" width="480" height="639" />}</div>
+          <b>{m.data.name}</b>
+          {m.data.role && <span>{m.data.role}</span>}
+          {m.data.intro && <p>{m.data.intro}</p>}
+        </article>
+      ))}
+    </div>
+    <p class="empty-note" style="margin-top:28px">问题反馈：{SITE.feedback}</p>
+  </div>
+</Base>

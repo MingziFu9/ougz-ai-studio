@@ -1,0 +1,16 @@
+{
+  "name": "ougz-ai-studio",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev --host",
+    "build": "astro build",
+    "preview": "astro preview --host"
+  },
+  "dependencies": {
+    "astro": "5.18.2",
+    "@fontsource/noto-serif-sc": "5.2.8",
+    "@fontsource/jetbrains-mono": "5.2.8"
+  }
+}

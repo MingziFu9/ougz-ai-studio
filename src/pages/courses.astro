@@ -1,0 +1,81 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { SITE } from '../data/site';
+const courses = (await getCollection('courses')).sort((a, b) => a.data.no - b.data.no);
+const online = courses.filter((c) => c.data.status === 'online').length;
+const GROUPS = [
+  { id: 'base', name: '专业基础课', en: 'FOUNDATION', blurb: '编程、网络、数据库与操作系统等专业基础。' },
+  { id: 'core', name: '专业核心课', en: 'CORE', blurb: '人工智能技术应用专业的主干课程。' },
+  { id: 'ext', name: '专业拓展课', en: 'ELECTIVE', blurb: '面向具体技术方向与新兴应用的拓展课程。' },
+];
+const RES = {
+  book: { name: '文字教材', icon: 'M5 4h9a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3Zm0 13a3 3 0 0 1 3-3h9' },
+  ppt: { name: '授课 PPT', icon: 'M4 5h16v11H4Zm8 11v4m-4 0h8' },
+  anim: { name: '交互动画', icon: 'M8 5v14l11-7Z' },
+  quiz: { name: '测试习题', icon: 'M5 12l4 4 10-10' },
+  lab: { name: '实验', icon: 'M9 3h6m-5 0v6L4 20h16L14 9V3' },
+} as const;
+const legend = ['book', 'ppt', 'anim', 'quiz'] as const;
+---
+<Base title="开源课程" active="courses" description="广州开放大学人工智能技术应用专业的开源课程：文字教材、授课 PPT、知识点交互动画与测试习题。">
+  <section class="hero page-hero oc-hero" slot="hero"><div class="wrap">
+    <div>
+      <p class="eyebrow"><i></i>OPEN COURSEWARE</p>
+      <h1>开源<em>课程</em></h1>
+      <p class="lede">开放，是开放大学的底色。作为广州开放大学人工智能技术应用专业的核心教学团队，我们把专业课程的文字教材、授课 PPT、知识点交互动画和测试习题逐门开源，让每一位想学 AI 的人都能免费获取、自由学习，也欢迎同行一起使用、修订和共建。</p>
+      <div class="oc-progress">
+        <div class="oc-num"><b>{online}</b><span>/ {courses.length} 门已开源</span></div>
+        <div class="oc-bar" style={`grid-template-columns:repeat(${courses.length},1fr)`} role="img" aria-label={`已开源 ${online} 门，共 ${courses.length} 门`}>
+          {courses.map((c) => <i class={c.data.status === 'online' ? 'on' : ''}></i>)}
+        </div>
+      </div>
+    </div>
+    <ul class="oc-legend" aria-label="资源类型">
+      {legend.map((k) => <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d={RES[k].icon} /></svg><b>{RES[k].name}</b></li>)}
+    </ul>
+  </div></section>
+
+  <div class="wrap" style="padding-block:40px 64px">
+    {GROUPS.map((g) => {
+      const items = courses.filter((c) => c.data.group === g.id);
+      return (
+        <section class="oc-sec">
+          <div class="cat-head"><h2>{g.name}</h2><p>{g.blurb}已开源 {items.filter((c) => c.data.status === 'online').length} / {items.length} 门</p></div>
+          <div class="oc-grid">
+            {items.map((c, i) => {
+              const d = c.data; const on = d.status === 'online';
+              return (
+                <article class={`oc-card ${on ? 'on' : 'soon'} g-${g.id}`} style={`--i:${i}`}>
+                  <div class="oc-cover">
+                    <span class="oc-tag">{g.en}</span>
+                    {d.inPlan && <span class="oc-no">{String(d.no).padStart(2, '0')}</span>}
+                    <b>{d.name}</b>
+                    {!on && <span class="oc-soon">建设中</span>}
+                  </div>
+                  <div class="oc-body">
+                    {on ? <p>{d.blurb}</p> : <p class="muted">课程资源正在编写中，敬请期待。</p>}
+                    {on && (
+                      <ul class="oc-res">
+                        {d.chapters && <li class="ch">{d.chapters} 章</li>}
+                        {d.res.map((k) => <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d={RES[k].icon} /></svg>{RES[k].name}</li>)}
+                      </ul>
+                    )}
+                    {on && (
+                      <div class="oc-act">
+                        <a class="btn primary" href={d.url} target="_blank" rel="noopener">在线阅读</a>
+                        {d.repo && <a class="btn" href={d.repo} target="_blank" rel="noopener" aria-label={`${d.name} 的 GitHub 仓库`}><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.4-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5a3.9 3.9 0 0 1 1-2.7c-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7a3.9 3.9 0 0 1 1 2.7c0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2Z" /></svg>GitHub</a>}
+                      </div>
+                    )}
+                    <p class="oc-by">广州开放大学人工智能教学团队</p>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      );
+    })}
+    <p class="empty-note" style="margin-top:8px">课程资源托管在 GitHub 上，欢迎在各课程仓库提出意见或参与共建。问题反馈：{SITE.feedback}</p>
+  </div>
+</Base>

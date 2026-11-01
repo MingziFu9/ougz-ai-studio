@@ -1,0 +1,9 @@
+---
+// 「立即使用」按钮。内网系统在用户不在内网时（body.net-out）换成「需连内网」；建设中的系统显示禁用按钮。
+interface Props { url?: string; network: 'intranet' | 'public'; status?: 'online' | 'building' }
+const { url, network, status = 'online' } = Astro.props;
+---
+{status === 'building' || !url
+  ? <span class="btn primary" aria-disabled="true">建设中，敬请期待</span>
+  : <a class="btn primary go" href={url} target="_blank" rel="noopener">立即使用 <span aria-hidden="true">↗</span></a>}
+{status !== 'building' && network === 'intranet' && <span class="btn primary go-off" aria-disabled="true" title="需要连接单位内网或 VPN">需连内网</span>}

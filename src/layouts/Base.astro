@@ -1,0 +1,49 @@
+---
+import '@fontsource/noto-serif-sc/900.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/500.css';
+import '../styles/global.css';
+import { getCollection } from 'astro:content';
+import { SITE } from '../data/site';
+import LogoMark from '../components/LogoMark.astro';
+
+interface Props { title?: string; description?: string; active?: string }
+const { title, description = SITE.description, active = '' } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const cats = (await getCollection('categories')).map((c) => c);
+const light = cats.map((c) => `--c-${c.id}:${c.data.color};`).join('');
+const dark = cats.map((c) => `--c-${c.id}:${c.data.colorDark};`).join('');
+const catCss = `:root{${light}}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){${dark}}}:root[data-theme="dark"]{${dark}}`;
+const nav = [
+  ['systems', '全部系统', `${base}#systems`],
+  ['courses', '开源课程', `${base}courses/`],
+  ['showcase', '成果展示', `${base}showcase/`],
+  ['guide', '使用指南', `${base}guide/`],
+  ['about', '关于团队', `${base}about/`],
+];
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title ? `${title} · ${SITE.title}` : SITE.title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <style set:html={catCss}></style>
+  </head>
+  <body>
+    <a class="skip" href="#content">跳到正文</a>
+    <div class="band-dark">
+      <header class="top"><div class="wrap">
+        <a class="brand" href={base}><LogoMark size={34} class="logo" /><span class="brandtext"><b>{SITE.name}</b><small>OUGZ AI STUDIO</small></span></a>
+        <nav class="main" aria-label="主导航">
+          {nav.map(([key, label, href]) => <a href={href} aria-current={active === key ? 'page' : undefined}>{label}</a>)}
+        </nav>
+      </div></header>
+      <slot name="hero" />
+    </div>
+    <div id="content"><slot /></div>
+    <footer><div class="wrap"><span class="fbrand"><LogoMark size={22} />ougz 人工智能工作室</span><span>问题反馈：{SITE.feedback}</span></div></footer>
+  </body>
+</html>

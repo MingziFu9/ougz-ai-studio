@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { loadAll } from '../lib/data';
+const faq = await getCollection('faq');
+const { systems } = await loadAll();
+const live = systems.filter((s) => s.data.status === 'online');
+const intranet = live.filter((s) => s.data.network === 'intranet');
+const pub = live.filter((s) => s.data.network === 'public');
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+---
+<Base title="使用指南" active="guide">
+  <section class="hero page-hero" slot="hero"><div class="wrap" style="display:block">
+    <p class="eyebrow"><i></i>GUIDE</p>
+    <h1>使用指南</h1>
+    <p class="lede">打不开、报警告、没账号，先看这里。</p>
+  </div></section>
+  <div class="wrap" style="padding-block:48px 64px">
+    <div class="netpane">
+      <div><h3><span class="badge in">内网</span>{intranet.length} 个系统，需在单位网络或 VPN 下打开</h3>
+        <ul>{intranet.map((s) => <li><a href={`${base}systems/${s.id}/`}>{s.data.name}</a></li>)}</ul></div>
+      <div><h3><span class="badge pub">公网</span>{pub.length} 个系统，校外也能打开</h3>
+        <ul>{pub.map((s) => <li><a href={`${base}systems/${s.id}/`}>{s.data.name}</a></li>)}</ul></div>
+    </div>
+    <div class="guide">
+      {faq.map((f, i) => <details open={i < 2}><summary>{f.data.q}</summary><p>{f.data.a}</p></details>)}
+    </div>
+  </div>
+</Base>

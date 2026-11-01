@@ -1,0 +1,10 @@
+---
+import { artFor } from '../lib/art';
+interface Props { art?: string; tag: string; color: string; class?: string; building?: boolean }
+const { art, tag, color, class: cls = '', building = false } = Astro.props;
+---
+<div class={`cover ${cls}`} style={`--cat:${color}`}>
+  <span class="tag">{tag}</span>
+  {building && <span class="tag build">建设中</span>}
+  <svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true" set:html={artFor(art)}></svg>
+</div>

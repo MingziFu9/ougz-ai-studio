@@ -1,0 +1,27 @@
+---
+import Cover from './Cover.astro';
+import GoButton from './GoButton.astro';
+import { hostOf } from '../lib/data';
+interface Props { sys: any; cat: any }
+const { sys, cat } = Astro.props;
+const d = sys.data;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const color = `var(--c-${cat.id})`;
+const building = d.status === 'building';
+const search = [d.name, d.short, d.description, d.scene, cat.data.name, ...d.features].join(' ').toLowerCase();
+---
+<article class={`card${building ? ' building' : ''}`} data-net={building ? 'building' : d.network} data-cat={cat.id} data-search={search} style={`--cat:${color}`}>
+  <Cover art={d.art} tag={cat.data.en} color={color} building={building} />
+  <div class="body">
+    <h3><a href={`${base}systems/${sys.id}/`}>{d.name}</a></h3>
+    {d.slogan && <p class="slogan">{d.slogan}</p>}
+    <p class="d">{d.description}</p>
+    {building
+      ? <div class="meta"><span class="badge build">建设中</span><span class="h">上线后在这里提供入口</span></div>
+      : <div class="meta"><span class={`badge ${d.network === 'intranet' ? 'in' : 'pub'}`}>{d.network === 'intranet' ? '内网' : '公网'}</span><span class="h">{hostOf(d.url)}</span></div>}
+    {building ? null : d.network === 'intranet'
+      ? <div class="hint hint-off"><span class="dot warn"></span>你不在内网，请先连接 VPN 再打开</div>
+      : null}
+    <div class="actions"><GoButton url={d.url} network={d.network} status={d.status} /><a class="btn" href={`${base}systems/${sys.id}/`}>了解更多</a></div>
+  </div>
+</article>

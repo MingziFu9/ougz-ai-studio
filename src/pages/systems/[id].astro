@@ -1,0 +1,75 @@
+---
+import Base from '../../layouts/Base.astro';
+import Cover from '../../components/Cover.astro';
+import GoButton from '../../components/GoButton.astro';
+import { loadAll, DEFAULT_STEPS } from '../../lib/data';
+
+export async function getStaticPaths() {
+  const { systems, catById } = await loadAll();
+  return systems.map((sys, i) => ({
+    params: { id: sys.id },
+    props: {
+      sys, cat: catById[sys.data.category],
+      related: systems.filter((s) => s.id !== sys.id && s.data.category === sys.data.category),
+      prev: systems[i - 1] ?? null, next: systems[i + 1] ?? null,
+    },
+  }));
+}
+const { sys, cat, related, prev, next } = Astro.props;
+const d = sys.data;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const color = `var(--c-${cat.id})`;
+const steps = d.steps.length ? d.steps : DEFAULT_STEPS(d.login);
+const todo = (v: string) => v || '待补充';
+const building = d.status === 'building';
+---
+<Base title={d.name} description={d.description}>
+  <section class="sys-hero" slot="hero" data-net={building ? 'building' : d.network} style={`--cat:${color}`}><div class="wrap">
+    <div>
+      <p class="crumbs"><a href={base}>全部系统</a><span>/</span><a href={`${base}#systems`}>{cat.data.name}</a></p>
+      <span class="catname">{cat.data.name}</span>{building && <span class="pill">建设中</span>}
+      <h1 class={d.name.length > 8 ? 'long' : undefined}>{d.name}</h1>
+      {d.slogan && <p class="slogan big">{d.slogan}</p>}
+      <p class="lede">{d.description}</p>
+      <div class="actions"><GoButton url={d.url} network={d.network} status={d.status} /></div>
+      {building ? null : d.network === 'intranet'
+        ? <div class="hint hint-off"><span class="dot warn"></span>你不在内网，请先连接 VPN 再打开</div>
+      : null}
+    </div>
+    <Cover art={d.art} tag={cat.data.en} color={color} building={building} />
+  </div></section>
+
+  <div class="wrap detail" style={`--cat:${color}`}>
+    <div>
+      {d.intro && <section><h2>系统介绍</h2><p>{d.intro}</p></section>}
+      <section><h2>适用场景</h2><p>{d.scene}</p>{d.audience && <p class="audience">适合：{d.audience}</p>}</section>
+      {d.features.length > 0 && <section><h2>功能亮点</h2><div class="feats">{d.features.map((f) => <div class="feat">{f}</div>)}</div></section>}
+      <section><h2>快速上手</h2><ol class="steps">{steps.map((s) => <li>{s}</li>)}</ol>
+        {!d.steps.length && !building && <p class="empty-note" style="margin-top:12px">详细的图文步骤或录屏由系统负责人补充。</p>}</section>
+      {related.length > 0 && <section><h2>同类系统</h2><div class="related">
+        {related.map((r) => <a href={`${base}systems/${r.id}/`}><span class="mini">{r.data.short}</span><span>{r.data.name}<small>{r.data.description}</small></span></a>)}
+      </div></section>}
+    </div>
+    <aside class="panel">
+      <h2>访问信息</h2>
+      <dl class="kv">
+        <dt>状态</dt><dd>{building ? '建设中' : '已上线'}</dd>
+        <dt>地址</dt><dd style="font-family:var(--f-mono);font-size:13px">{d.url ?? '上线后提供'}</dd>
+        {!building && <><dt>网络</dt><dd>{d.network === 'intranet' ? '单位内网（校外需 VPN）' : '公网可访问'}</dd></>}
+        <dt>账号</dt><dd>{d.login ? '需要登录' : '无需登录或待确认'}</dd>
+        <dt>负责人</dt><dd class={d.owner ? '' : 'todo'}>{todo(d.owner)}</dd>
+        <dt>联系方式</dt><dd class={d.contact ? '' : 'todo'}>{todo(d.contact)}</dd>
+        <dt>最近更新</dt><dd class={d.updated ? '' : 'todo'}>{todo(d.updated)}</dd>
+      </dl>
+      <div class="related" style="margin-top:20px">
+        {prev && <a href={`${base}systems/${prev.id}/`}><span class="mini" style={`--cat:var(--c-${prev.data.category})`}>←</span><span>上一个<small>{prev.data.name}</small></span></a>}
+        {next && <a href={`${base}systems/${next.id}/`}><span class="mini" style={`--cat:var(--c-${next.data.category})`}>→</span><span>下一个<small>{next.data.name}</small></span></a>}
+      </div>
+    </aside>
+  </div>
+</Base>
+
+<script>
+  import { initNetwork } from '../../lib/client';
+  initNetwork();
+</script>

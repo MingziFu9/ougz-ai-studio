@@ -1,0 +1,102 @@
+---
+import Base from '../layouts/Base.astro';
+import SystemCard from '../components/SystemCard.astro';
+import HeroDemo from '../components/HeroDemo.astro';
+import { loadAll } from '../lib/data';
+import { getCollection } from 'astro:content';
+
+const { categories, systems } = await loadAll();
+const faq = (await getCollection('faq')).slice(0, 2);
+const courses = (await getCollection('courses')).sort((a, b) => a.data.no - b.data.no);
+const ocOn = courses.filter((c) => c.data.status === 'online');
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const live = systems.filter((s) => s.data.status === 'online');
+const nIn = live.filter((s) => s.data.network === 'intranet').length;
+const nPub = live.length - nIn;
+const nBuild = systems.length - live.length;
+const groups = categories.map((c) => ({ cat: c, items: systems.filter((s) => s.data.category === c.id) })).filter((g) => g.items.length);
+
+---
+<Base active="systems">
+  <section class="hero" slot="hero"><div class="wrap">
+    <div>
+      <p class="eyebrow"><i></i>AI STUDIO · 自研系统</p>
+      <h1>让教学更高效，<br />让创新<em>看得见</em></h1>
+      <p class="lede">从备课、出题、做视频，到上机实训和论文审核。找到要用的系统，点「立即使用」直接打开。</p>
+      <div class="stats">
+        <div class="stat"><b data-to>{live.length}</b><span>个已上线系统</span></div>
+        <div class="stat"><b data-to>{categories.length}</b><span>类使用场景</span></div>
+        <div class="stat"><b data-to>{nIn}</b><span>个内网系统</span></div>
+        <div class="stat"><b data-to>{nPub}</b><span>个公网系统</span></div>
+        {nBuild > 0 && <div class="stat"><b data-to>{nBuild}</b><span>个建设中</span></div>}
+      </div>
+    </div>
+    <HeroDemo systems={systems} />
+  </div></section>
+
+  <div class="filters"><div class="wrap" id="filters" role="group" aria-label="按场景筛选">
+    <button class="chip" type="button" data-cat="all" aria-pressed="true">全部<span class="n">{systems.length}</span></button>
+    {categories.map((c) => <button class="chip" type="button" data-cat={c.id} aria-pressed="false" style={`--cat:var(--c-${c.id})`}><i></i>{c.data.name}<span class="n">{systems.filter((s) => s.data.category === c.id).length}</span></button>)}
+    <span class="count" id="count">显示 {systems.length} / {systems.length} 个系统</span>
+  </div></div>
+
+  <main class="wrap" id="systems">
+    {groups.map((g) => (
+      <section class="cat-sec" data-cat={g.cat.id} style={`--cat:var(--c-${g.cat.id})`}>
+        <div class="cat-head"><h2>{g.cat.data.name}</h2><p>{g.cat.data.blurb}</p></div>
+        <div class="grid">{g.items.map((s) => <SystemCard sys={s} cat={g.cat} />)}</div>
+      </section>
+    ))}
+    <div class="empty" id="empty" hidden>这个分类下暂时没有系统。</div>
+  </main>
+
+  <section class="band oc-band"><div class="wrap">
+    <div>
+      <h2 class="sec">开源课程</h2>
+      <p class="sec-lede">团队也是广州开放大学人工智能技术应用专业的核心教学团队，正把专业课程逐门开源：文字教材、授课 PPT、知识点交互动画和测试习题。已开源 {ocOn.length} / {courses.length} 门。</p>
+      <a class="btn primary" style="flex:none" href={`${base}courses/`}>查看全部开源课程 →</a>
+    </div>
+    <div class="oc-mini">
+      {courses.map((c) => c.data.status === 'online' ? <a href={c.data.url} target="_blank" rel="noopener">{c.data.name}</a> : <span>{c.data.name} · 建设中</span>)}
+    </div>
+  </div></section>
+
+  <section class="band"><div class="wrap">
+    <h2 class="sec">打不开或不会用？</h2>
+    <p class="sec-lede">{faq.map((f) => f.data.q).join('、')}，这些常见问题都在使用指南里。</p>
+    <div class="quick">
+      <a href={`${base}guide/`}><b>使用指南 →</b><span>内网与 VPN、账号申请、问题反馈</span></a>
+      <a href={`${base}showcase/`}><b>成果展示 →</b><span>各系统的代表性成品：视频、课件、动画</span></a>
+    </div>
+  </div></section>
+</Base>
+
+<script>
+  import { initNetwork, initMotion, initDemo } from '../lib/client';
+  initNetwork();
+  initMotion();
+  initDemo();
+
+  const $ = <T extends Element>(q: string) => document.querySelector(q) as T;
+  const state = { q: '', cat: 'all' };
+  const cards = [...document.querySelectorAll<HTMLElement>('#systems .card')];
+  const sections = [...document.querySelectorAll<HTMLElement>('#systems .cat-sec')];
+  function apply() {
+    const q = state.q.trim().toLowerCase();
+    let shown = 0;
+    cards.forEach((c) => {
+      const ok = (state.cat === 'all' || c.dataset.cat === state.cat) && (!q || (c.dataset.search || '').includes(q));
+      c.hidden = !ok; if (ok) shown++;
+    });
+    sections.forEach((s) => (s.hidden = !s.querySelector('.card:not([hidden])')));
+    $('#empty').toggleAttribute('hidden', shown > 0);
+    $('#count').textContent = `显示 ${shown} / ${cards.length} 个系统`;
+    dispatchEvent(new Event('scroll'));
+  }
+  $('#filters').addEventListener('click', (e) => {
+    const b = (e.target as Element).closest<HTMLElement>('[data-cat]'); if (!b) return;
+    state.cat = b.dataset.cat!;
+    document.querySelectorAll('#filters .chip').forEach((x) => x.setAttribute('aria-pressed', String((x as HTMLElement).dataset.cat === state.cat)));
+    apply();
+  });
+</script>

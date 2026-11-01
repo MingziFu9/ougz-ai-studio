@@ -1,0 +1,21 @@
+# 团队成员。photo 填 public/team/ 下的文件名；role（职务）、intro 可选，不填则不显示，按 order 从左到右排列（与合照站位一致）。
+- id: m1
+  name: 陈老师
+  photo: m1.jpg
+  order: 1
+- id: m2
+  name: 王老师
+  photo: m2.jpg
+  order: 2
+- id: m3
+  name: 吴老师
+  photo: m3.jpg
+  order: 3
+- id: m4
+  name: 龚老师
+  photo: m4.jpg
+  order: 4
+- id: m5
+  name: 符老师
+  photo: m5.jpg
+  order: 5

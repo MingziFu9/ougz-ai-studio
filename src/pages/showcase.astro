@@ -1,0 +1,33 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { loadAll } from '../lib/data';
+const { catById } = await loadAll();
+const sysById = Object.fromEntries((await getCollection('systems')).map((s) => [s.id, s]));
+const items = (await getCollection('showcase')).sort((a, b) => Number(b.data.featured) - Number(a.data.featured));
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const src = (p: string) => (p.startsWith('http') ? p : base + p.replace(/^\//, ''));
+---
+<Base title="成果展示" active="showcase">
+  <section class="hero page-hero" slot="hero"><div class="wrap" style="display:block">
+    <p class="eyebrow"><i></i>SHOWCASE</p>
+    <h1>成果展示</h1>
+    <p class="lede">各系统的代表性成品。想看效果，先从这里开始。</p>
+  </div></section>
+  <div class="wrap" style="padding-block:48px 64px">
+    <div class="showcase">
+      {items.map((it) => {
+        const sys = sysById[it.data.system];
+        const color = sys ? `var(--c-${catById[sys.data.category]?.id})` : 'var(--accent)';
+        return (
+          <div class={`case${it.data.featured ? ' big' : ''}`} style={`--cat:${color}`}>
+            {it.data.video ? <video src={src(it.data.video)} controls preload="metadata" playsinline></video>
+              : it.data.image ? <img src={src(it.data.image)} alt={it.data.title} loading="lazy" />
+              : <div class="ph">{it.data.note || '成品待提供'}</div>}
+            <div class="t"><b>{it.data.title}</b>{sys && <span><a href={`${base}systems/${sys.id}/`}>{sys.data.name}</a></span>}</div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</Base>

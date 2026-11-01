@@ -1,0 +1,101 @@
+---
+// 首屏右侧：一个浏览器窗口轮流演示几个代表性系统的真实使用过程（输入、点击生成、出结果）
+import { hostOf } from '../lib/data';
+interface Props { systems: any[] }
+const { systems } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const pick = (id: string) => systems.find((s) => s.id === id)?.data;
+const SCENES = [
+  { id: 'ppt', toast: '24 页讲稿已生成' },
+  { id: 'avatar', toast: '数字人讲解视频已生成 · 03:42' },
+  { id: 'qbank', toast: '已生成 30 道练习题（含解析）' },
+  { id: 'parse', toast: '扫描版 PDF 已转为文字版 · 186 页' },
+].filter((s) => pick(s.id)).map((s) => ({ ...s, d: pick(s.id)! }));
+---
+<div class="demo" id="demo" aria-label="系统使用演示">
+  <div class="win">
+    <div class="winbar">
+      <span class="lights"><i></i><i></i><i></i></span>
+      <div class="tabs" role="tablist">
+        {SCENES.map((s, i) => <button type="button" role="tab" class="tab" data-k={i} aria-selected={i === 0 ? 'true' : 'false'}>{s.d.short}</button>)}
+      </div>
+    </div>
+    <div class="addr">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
+      {SCENES.map((s, i) => <span class="url" data-k={i} hidden={i !== 0}>{hostOf(s.d.url)}</span>)}
+    </div>
+    <div class="screen">
+      {SCENES.map((s, i) => (
+        <a class={`scene sc-${s.id}`} data-k={i} href={`${base}systems/${s.id}/`} aria-label={`查看${s.d.name}`} data-toast={s.toast} hidden={i !== 0}>
+          <div class="apphead"><b>{s.d.name}</b><span class="status"><i></i><em>就绪</em></span></div>
+
+          {s.id === 'ppt' && (
+            <div class="body ppt">
+              <div class="form">
+                <label>上传 PPT</label>
+                <div class="drop"><span class="file"><i>P</i><span class="type" data-text="第3章_机器学习的流程.pptx"></span></span><small>24 页</small></div>
+                <span class="btn go">生成讲稿</span>
+              </div>
+              <div class="out">
+                {[['3.1 数据收集', '这一页先说数据从哪里来：问卷、传感器、业务系统……'], ['3.2 数据预处理', '拿到的数据往往有缺失和错误，需要先清洗，再统一格式……'], ['3.3 特征工程', '特征就是模型看问题的角度，选得好，模型才学得快……']].map(([t, n], k) => (
+                  <div class="row slide" style={`--n:${k}`}><span class="thumb"><b>{t}</b><i></i><i class="s"></i></span><p><em>第 {k + 1} 页讲稿</em>{n}</p></div>
+                ))}
+                <div class="bar"><span></span></div><p class="cap">已生成 <em data-count="24">0</em> / 24 页讲稿</p>
+              </div>
+            </div>
+          )}
+
+          {s.id === 'avatar' && (
+            <div class="body avatar">
+              <div class="upl"><span class="file"><i>P</i>第3章_机器学习的流程（含讲稿）.pptx</span><span class="btn go">生成视频</span></div>
+              <div class="video">
+                <div class="board"><b>3.4 模型训练</b><i></i><i></i><i class="s"></i></div>
+                <svg class="presenter" viewBox="0 0 120 150" aria-hidden="true">
+                  <path d="M10 150c4-34 24-50 50-50s46 16 50 50Z" fill="#2f3a52" />
+                  <path d="M48 100l12 22 12-22Z" fill="#f4f6fa" />
+                  <ellipse cx="60" cy="58" rx="25" ry="30" fill="#e9c4a6" />
+                  <path d="M34 54c0-22 12-34 27-34s26 11 26 32c-6-10-16-15-30-14-9 1-16 6-23 16Z" fill="#2a2522" />
+                  <ellipse class="mouth" cx="60" cy="74" rx="6" ry="2.4" fill="#9b4d45" />
+                </svg>
+                <p class="sub"><span class="type" data-text="同学们好，这一节我们来看模型是怎样从数据里学会规律的。"></span></p>
+                <div class="ctrl"><span class="play"></span><div class="tl"><span></span></div><em>03:42</em></div>
+              </div>
+              <div class="wave">{Array.from({ length: 28 }, (_, k) => <i style={`--k:${k}`}></i>)}</div>
+            </div>
+          )}
+
+          {s.id === 'qbank' && (
+            <div class="body qbank">
+              <div class="q">
+                <p class="qt"><span class="tag">单选题</span>机器学习的一般流程中，第一步通常是？</p>
+                <ol>
+                  <li>A. 模型训练</li><li class="ok">B. 数据收集</li><li>C. 模型评估</li><li>D. 部署上线</li>
+                </ol>
+                <p class="exp">解析：没有数据就无法训练模型，流程从收集数据开始。</p>
+              </div>
+              <div class="q q2">
+                <p class="qt"><span class="tag">判断题</span>训练集上准确率越高，模型就一定越好。</p>
+                <ol><li>正确</li><li class="ok">错误</li></ol>
+              </div>
+              <p class="cap">已生成 <em data-count="30">0</em> / 30 题 · 单选 12 · 多选 6 · 判断 8 · 简答 4</p>
+            </div>
+          )}
+
+          {s.id === 'parse' && (
+            <div class="body parse">
+              <div class="page scan"><b></b>{Array.from({ length: 9 }, (_, k) => <i style={`--w:${[92, 86, 95, 70, 90, 88, 60, 94, 78][k]}%`}></i>)}<span class="beam"></span></div>
+              <span class="arrow">→</span>
+              <div class="page text">
+                <b>第 3 章　机器学习的流程</b>
+                <p><span class="type" data-text="机器学习通常包括数据收集、数据预处理、特征工程、模型训练、模型评估和部署上线六个步骤。每一步的质量都会影响最终模型的效果……"></span></p>
+              </div>
+              <p class="cap">识别中 <em data-count="186">0</em> / 186 页 · 文字可复制、可检索</p>
+            </div>
+          )}
+        </a>
+      ))}
+      <svg class="cursor" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2l16 9.5-7 1.6L9.4 20Z" fill="#fff" stroke="#111" stroke-width="1.4" stroke-linejoin="round" /></svg>
+    </div>
+  </div>
+  <div class="toast" id="toast" aria-live="polite"><i>✓</i><span></span></div>
+</div>

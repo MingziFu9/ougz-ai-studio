@@ -1,0 +1,15 @@
+# 成果展示。把图片或视频放到 public/showcase/ 目录，然后在 image 或 video 里填 /showcase/文件名。
+# 不填 image/video 时显示占位框。featured: true 的那一项会放大显示。
+- id: avatar-demo
+  title: 数字人讲解一节完整微课
+  system: avatar
+  note: 嵌入 1–2 分钟视频片段
+  featured: true
+- id: ppt-demo
+  title: 一份 PPT 的逐页讲稿
+  system: ppt
+  note: 放 PPT 页面与备注讲稿截图
+- id: anim-demo
+  title: 一个知识点的讲解动画
+  system: anim
+  note: 放动画片段或 GIF
